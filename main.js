@@ -1,191 +1,149 @@
-const URL = "https://api.openweathermap.org/data/2.5/weather?q=${cidade}&units=metric&appid=70450de2ac958905e084a5685183cd6e";
+const API_KEY = "70450de2ac958905e084a5685183cd6e";
 
-/*
-async function recuperar() {
-    let receber = await fetch(URL)
+const imageElement = document.getElementById("image");
+const placeElement = document.getElementById("place");
+const locationInput = document.getElementById("local");
+const newsElement = document.getElementById("noticias");
 
-    let data = await receber.json();
-    
-        return data;
-}
-*/
+const windElement = document.getElementById("wind");
+const humidityElement = document.getElementById("humidity");
 
-var imagem = document.getElementById("image");
+const maxTempElement = document.getElementById("temp_max");
+const minTempElement = document.getElementById("temp_min");
 
-var lugar = document.getElementById("place");
+const cloudsElement = document.getElementById("clouds");
+const weatherElement = document.getElementById("weather");
+const feelsLikeElement = document.getElementById("feels_like");
+const tempElement = document.getElementById("temp");
 
-var local = document.getElementById("local");
+function fetchWeather() {
+    const city = locationInput.value;
 
-var info = document.getElementById("noticias");
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.cod === "404") {
+                imageElement.src = "/assets/img/sem-resultados.png";
+                placeElement.innerText = "place: couldn't find current place";
 
+                windElement.innerText = "wind speed: ";
+                humidityElement.innerText = "humidity: ";
 
-var vento = document.getElementById("wind");
-var humidade = document.getElementById("humidity");
+                maxTempElement.innerText = "maximum temperature: ";
+                minTempElement.innerText = "minimum temperature: ";
 
-var tempMaxima = document.getElementById("temp_max");
-var tempMinima = document.getElementById("temp_min");
+                cloudsElement.innerText = "clouds: ";
+                weatherElement.innerText = "weather: ";
+                feelsLikeElement.innerText = "feels like: ";
+                tempElement.innerText = "temperature: ";
 
-var nuvens = document.getElementById("clouds");
-var tempo = document.getElementById("weather");
-var sensa = document.getElementById("feels_like");
-var temperatura = document.getElementById("temp");
+                tempElement.style.color = "blue";
+                feelsLikeElement.style.color = "blue";
+                minTempElement.style.color = "blue";
+                maxTempElement.style.color = "blue";
+            } else {
+                const weatherDescription = data.weather[0].description;
+                switch (weatherDescription) {
+                    case "clear sky":
+                        imageElement.src = "./assets/img/ensolarado.png";
+                        break;
+                    case "few clouds":
+                        imageElement.src = "./assets/img/pequena nuvem.png";
+                        break;
+                    case "broken clouds":
+                        imageElement.src = "./assets/img/nuvens.png";
+                        break;
+                    case "scattered clouds":
+                        imageElement.src = "./assets/img/nuvem.png";
+                        break;
+                    case "overcast clouds":
+                        imageElement.src = "./assets/img/muitas nuvens.png";
+                        break;
+                    case "moderate rain":
+                        imageElement.src = "./assets/img/chuva fraca.png";
+                        break;
+                    case "light rain":
+                        imageElement.src = "./assets/img/chuva.png";
+                        break;
+                    case "heavy intensity rain":
+                        imageElement.src = "./assets/img/trovoada.png";
+                        break;
+                    case "snow":
+                        imageElement.src = "./assets/img/neve.png";
+                        break;
+                    case "mist":
+                        imageElement.src = "./assets/img/mist.png";
+                        break;
+                    default:
+                        imageElement.src = "/assets/img/default.png";
+                }
 
-function recuperar() {
-    let cidade = local.value;
+                updateElementColors(data.main);
 
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cidade}&units=metric&appid=70450de2ac958905e084a5685183cd6e`)
-    .then(resposta => {
-        return resposta.json();
-    })
-    .then(data => {
-        if(data.cod == "404") {
-            imagem.src = "/assets/img/sem-resultados.png"; 
-            
-            lugar.innerText = "place: couldn't find current place";
+                windElement.innerText = `wind speed: ${data.wind.speed} km/h`;
+                humidityElement.innerText = `humidity: ${data.main.humidity}%`;
+                maxTempElement.innerText = `maximum temperature: ${data.main.temp_max} ºC`;
+                minTempElement.innerText = `minimum temperature: ${data.main.temp_min} ºC`;
+                cloudsElement.innerText = `clouds: ${data.clouds.all}%`;
+                weatherElement.innerText = `weather: ${data.weather[0].description}`;
+                feelsLikeElement.innerText = `feels like: ${data.main.feels_like} ºC`;
+                tempElement.innerText = `temperature: ${data.main.temp} ºC`;
+                placeElement.innerText = `place: ${data.name}`;
 
-            vento.innerText = "wind speed: ";
-            humidade.innerText = "humidity: ";
-
-            tempMaxima.innerText = "maximun temperature: ";
-            tempMinima.innerText = "minimun temperature: ";
-
-            nuvens.innerText = "clouds: ";
-            tempo.innerText = "weather: ";
-            sensa.innerText = "feels like: ";
-            temperatura.innerText = "temperature: ";
-
-            temperatura.style.color = "blue";
-            sensa.style.color = "blue";
-            tempMinima.style.color = "blue";
-            tempMaxima.style.color = "blue";
-        }
-
-        else if(data.weather[0].description == "clear sky") {
-            imagem.src = "./assets/img/ensolarado.png"; 
-        }
-
-        else if(data.weather[0].description == "few clouds") {
-            imagem.src = "./assets/img/pequena nuvem.png"; 
-        }
-
-        else if(data.weather[0].description == "broken clouds") {
-            imagem.src = "./assets/img/nuvens.png"; 
-        }
-
-        else if(data.weather[0].description == "scattered clouds") {
-            imagem.src = "./assets/img/nuvem.png"; 
-        }
-
-        else if(data.weather[0].description == "overcast clouds") {
-            imagem.src = "./assets/img/muitas nuvens.png"; 
-        }
-
-        else if(data.weather[0].description == "moderate rain") {
-            imagem.src = "./assets/img/chuva fraca.png"
-        }
-
-        else if(data.weather[0].description == "light rain") {
-            imagem.src = "./assets/img/chuva.png"; 
-        }
-
-        else if(data.weather[0].description == "heavy intensity rain") {
-            imagem.src = "./assets/img/trovoada.png"; 
-        }
-
-        else if(data.weather[0].description == "snow") {
-            imagem.src = "./assets/img/neve.png"; 
-        }
-
-        else if(data.weather[0].description == "mist") {
-            imagem.src = "./assets/img/mist.png"; 
-        }
-
-
-        if(data.main.temp >= 30) {
-            temperatura.style.color = "red";
-        }
-        if(data.main.feels_like >= 30) {
-            sensa.style.color = "red";
-        }
-        if(data.main.temp_min >= 30) {
-            tempMinima.style.color = "red";
-        }
-        if(data.main.temp_max >= 30) {
-            tempMaxima.style.color = "red";
-        }
-
-
-        if(data.main.temp <= 0) {
-            temperatura.style.color = "#87CEEB";
-        }
-        if(data.main.feels_like <= 0) {
-            sensa.style.color = "#87CEEB";
-        }
-        if(data.main.temp_min <= 0) {
-            tempMinima.style.color = "#87CEEB";
-        }
-        if(data.main.temp_max <= 0) {
-            tempMaxima.style.color = "#87CEEB";
-        }
-    
-
-        vento.innerText = "wind speed: " + data.wind.speed + " km/h";
-        humidade.innerText = "humidity: " + data.main.humidity + "%";
-
-        tempMaxima.innerText = "maximun temperature: " + data.main.temp_max + " ºC";
-        tempMinima.innerText = "minimun temperature: " + data.main.temp_min + " ºC";
-
-        nuvens.innerText = "clouds: " + data.clouds.all + "%";
-        tempo.innerText = "weather: " + data.weather[0].description;
-        sensa.innerText = "feels like: " + data.main.feels_like + " ºC";
-        temperatura.innerText = "temperature: " + data.main.temp + " ºC";
-
-        lugar.innerText = "place: " + data.name;
-
-        console.log(data.main.temp);
-    })
+                console.log(data.main.temp);
+            }
+        });
 }
 
-function aoIniciar() {
-    fetch("http://ip-api.com/json")
-    .then(response => {
-        return response.json();
-    })
-    .then(ip => {
-        local.value = ip.city;
-        recuperar();
+function updateElementColors(main) {
+    const elements = [
+        { element: tempElement, value: main.temp },
+        { element: feelsLikeElement, value: main.feels_like },
+        { element: minTempElement, value: main.temp_min },
+        { element: maxTempElement, value: main.temp_max },
+    ];
 
-        local.value = "";
+    elements.forEach(({ element, value }) => {
+        if (value >= 30) {
+            element.style.color = "red";
+        } else if (value <= 0) {
+            element.style.color = "#87CEEB";
+        } else {
+            element.style.color = "";
+        }
     });
 }
 
 window.addEventListener("load", () => {
-    aoIniciar();
+    fetch("http://ip-api.com/json")
+        .then(response => response.json())
+        .then(ip => {
+            locationInput.value = ip.city;
+            fetchWeather();
+            locationInput.value = "";
+        });
 });
 
-//var resposta = recuperar();
-
-document.addEventListener("keypress", e =>{
-    if(e.which == 13){
-        recuperar();
+document.addEventListener("keypress", e => {
+    if (e.which === 13) {
+        fetchWeather();
     }
 });
 
-
-info.addEventListener("mouseover", () =>{
-    info.style.borderWidth = "3px"
-    info.style.borderColor = "blue"
+newsElement.addEventListener("mouseover", () => {
+    newsElement.style.borderWidth = "3px";
+    newsElement.style.borderColor = "blue";
 });
 
-info.addEventListener("mouseout", () =>{
-    info.style.borderWidth = "0px"
+newsElement.addEventListener("mouseout", () => {
+    newsElement.style.borderWidth = "0px";
 });
 
-local.addEventListener("mouseover", () =>{
-    local.style.borderWidth = "3px"
-    local.style.borderColor = "blue"
+locationInput.addEventListener("mouseover", () => {
+    locationInput.style.borderWidth = "3px";
+    locationInput.style.borderColor = "blue";
 });
 
-local.addEventListener("mouseout", () =>{
-    local.style.borderWidth = "0px"
+locationInput.addEventListener("mouseout", () => {
+    locationInput.style.borderWidth = "0px";
 });
